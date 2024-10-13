@@ -1,3 +1,8 @@
 /client/.vscode
 /client/node_modules
 /client/dist
+
+/server/obj
+/server/bin
+/server/config.cs
+/server/database/database.db
