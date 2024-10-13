@@ -1,2 +1,2 @@
 # DStorage
-File storage on Discord. For scientific purposes only.
+(In developement) file storage on Discord. For scientific purposes only.
