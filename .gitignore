@@ -6,3 +6,4 @@
 /server/bin
 /server/appsettings.json
 /server/Data/database.db
+/server/test.http
