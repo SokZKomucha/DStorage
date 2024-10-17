@@ -4,5 +4,5 @@
 
 /server/obj
 /server/bin
-/server/config.cs
+/server/appsettings.json
 /server/database/database.db
