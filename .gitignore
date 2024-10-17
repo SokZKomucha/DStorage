@@ -5,4 +5,4 @@
 /server/obj
 /server/bin
 /server/appsettings.json
-/server/database/database.db
+/server/Data/database.db
