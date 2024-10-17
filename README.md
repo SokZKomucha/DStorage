@@ -5,7 +5,7 @@
 
 ## Setup
 
-This web application is comprised of two parts: client and server. Both of them are run separately; following sections guide you through its setup.
+This web application is comprised of two parts: client and server. Both of them are run separately; following sections guide will you through its setup.
 
 ### Requirements
 
