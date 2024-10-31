@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Security.Cryptography;
+using System.Text;
+using Microsoft.EntityFrameworkCore;
 using Server.Data;
 
 namespace Server {
@@ -15,6 +17,14 @@ namespace Server {
       WebApplication app = builder.Build();
       app.MapControllers();
       app.Run();
+
+
+
+
+      // var original = "$2a$10$wjBpYhMPc9oeOVB0yyZ8S.HgTQc07bek5uE132zoVvZeyP2gCMDSe";
+      // var good = BCrypt.Net.BCrypt.EnhancedVerify("asdfe", original);
+      // Console.WriteLine(good);
+
 
     }
   }
