@@ -18,13 +18,9 @@ namespace Server {
       app.MapControllers();
       app.Run();
 
-
-
-
       // var original = "$2a$10$wjBpYhMPc9oeOVB0yyZ8S.HgTQc07bek5uE132zoVvZeyP2gCMDSe";
       // var good = BCrypt.Net.BCrypt.EnhancedVerify("asdfe", original);
       // Console.WriteLine(good);
-
 
     }
   }
