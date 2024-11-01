@@ -13,7 +13,7 @@ namespace Server.Controllers {
   [ApiController]
   public class AuthController : ControllerBase {
 
-    SQLiteContext database;
+    private readonly SQLiteContext database;
 
     public AuthController(SQLiteContext database) {
       this.database = database;
@@ -23,18 +23,19 @@ namespace Server.Controllers {
     public IActionResult Authenticate() {
 
       if (Request.Cookies["secret"] == null) {
-        return BadRequest("Missing \"Secret\" cookie");
+        return BadRequest("Missing \"Secret\" cookie.");
       } 
 
-      var accountData = database.Users
-        .Where(x => x.Secret == Request.Cookies["secret"])
-        .Select(x => x);
+      var account = database.Users
+        .Where(x => x.Secret == Request.Cookies["secret"]);
 
-      if (!accountData.Any()) {
-        return NotFound("User not found");
+      if (!account.Any()) {
+        return NotFound("User not found.");
       }
 
-      return Ok(new SuccesfulAuthenticationDTO(accountData.First().Id, accountData.First().Username));      
+      var accountData = account.First();
+
+      return Ok(new SuccesfulAuthenticationDTO(accountData.Id, accountData.Username));      
     }
 
     [HttpPost("login")]
@@ -45,28 +46,29 @@ namespace Server.Controllers {
       }
 
       if (loginUserDto.Password == null || loginUserDto.Password.Trim() == "") {
-        return BadRequest("Password field is empty");
+        return BadRequest("Password field is empty.");
       }
 
-      var accountData = database.Users
-        .Where(x => x.Username == loginUserDto.Username.Trim())
-        .Select(x => x);
+      var account = database.Users
+        .Where(x => x.Username == loginUserDto.Username.Trim());
 
-      if (!accountData.Any()) {
+      if (!account.Any()) {
         return Unauthorized("Incorrect username or password.");
       }
 
-      if (!BCrypt.Net.BCrypt.EnhancedVerify(loginUserDto.Password.Trim(), accountData.First().PasswordHash)) {
+      var accountData = account.First();
+
+      if (!BCrypt.Net.BCrypt.EnhancedVerify(loginUserDto.Password.Trim(), accountData.PasswordHash)) {
         return Unauthorized("Incorrect username or password.");
       }
 
-      Response.Cookies.Append("secret", accountData.First().Secret, new CookieOptions() {
+      Response.Cookies.Append("secret", accountData.Secret, new CookieOptions() {
         HttpOnly = true,
         Secure = true,
         SameSite = Microsoft.AspNetCore.Http.SameSiteMode.None,
       });
 
-      return Ok(new SuccesfulLoginDTO(accountData.First().Id, accountData.First().Username));
+      return Ok(new SuccesfulLoginDTO(accountData.Id, accountData.Username));
     }
     
     [HttpPost("register")]
