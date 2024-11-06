@@ -3,10 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Server.Data;
 using Server.DTOs;
 using Server.Models;
-using BCrypt.Net;
 using System.Security.Cryptography;
-using Microsoft.Net.Http.Headers;
-using System.Net;
 
 namespace Server.Controllers {
   [Route("/api/[controller]")]
@@ -23,19 +20,19 @@ namespace Server.Controllers {
     public IActionResult Authenticate() {
 
       if (Request.Cookies["secret"] == null) {
-        return BadRequest("Missing \"Secret\" cookie.");
+        return BadRequest("Missing \"secret\" cookie.");
       } 
 
-      var account = database.Users
+      var user = database.Users
         .Where(x => x.Secret == Request.Cookies["secret"]);
 
-      if (!account.Any()) {
+      if (!user.Any()) {
         return NotFound("User not found.");
       }
 
-      var accountData = account.First();
+      var userData = user.First();
 
-      return Ok(new SuccesfulAuthenticationDTO(accountData.Id, accountData.Username));      
+      return Ok(new SuccesfulAuthenticationDTO(userData.Id, userData.Username));      
     }
 
     [HttpPost("login")]
@@ -49,26 +46,26 @@ namespace Server.Controllers {
         return BadRequest("Password field is empty.");
       }
 
-      var account = database.Users
+      var user = database.Users
         .Where(x => x.Username == loginUserDto.Username.Trim());
 
-      if (!account.Any()) {
+      if (!user.Any()) {
         return Unauthorized("Incorrect username or password.");
       }
 
-      var accountData = account.First();
+      var userData = user.First();
 
-      if (!BCrypt.Net.BCrypt.EnhancedVerify(loginUserDto.Password.Trim(), accountData.PasswordHash)) {
+      if (!BCrypt.Net.BCrypt.EnhancedVerify(loginUserDto.Password.Trim(), userData.PasswordHash)) {
         return Unauthorized("Incorrect username or password.");
       }
 
-      Response.Cookies.Append("secret", accountData.Secret, new CookieOptions() {
+      Response.Cookies.Append("secret", userData.Secret, new CookieOptions() {
         HttpOnly = true,
         Secure = true,
-        SameSite = Microsoft.AspNetCore.Http.SameSiteMode.None,
+        SameSite = SameSiteMode.None,
       });
 
-      return Ok(new SuccesfulLoginDTO(accountData.Id, accountData.Username));
+      return Ok(new SuccesfulLoginDTO(userData.Id, userData.Username));
     }
     
     [HttpPost("register")]
@@ -94,6 +91,7 @@ namespace Server.Controllers {
       do {
         user.Secret = Convert.ToHexString(RandomNumberGenerator.GetBytes(32));
       } while (database.Users.Where(x => x.Secret == user.Secret).Any());
+      // Or make the field UNIQUE?
 
       try {
         await database.Users.AddAsync(user);
@@ -105,7 +103,7 @@ namespace Server.Controllers {
       Response.Cookies.Append("secret", user.Secret, new CookieOptions() {
         HttpOnly = true,
         Secure = true,
-        SameSite = Microsoft.AspNetCore.Http.SameSiteMode.None,
+        SameSite = SameSiteMode.None,
       });
 
       return StatusCode(201, new SuccesfulRegisterDTO(user.Id, user.Username));
