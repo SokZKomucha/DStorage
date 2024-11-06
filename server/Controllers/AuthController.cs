@@ -110,3 +110,7 @@ namespace Server.Controllers {
     }
   }
 }
+
+// GET /api/auth -> Authenticate
+// POST /api/auth/login -> Login
+// POST /api/auth/register -> Register
