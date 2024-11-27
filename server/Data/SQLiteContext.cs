@@ -8,18 +8,18 @@ namespace Server.Data {
     public DbSet<FileModel> Files { get; set; }
     public DbSet<ChunkModel> Chunks { get; set; }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder) {
-          modelBuilder.Entity<UserModel>()
-            .HasMany(x => x.Files)
-            .WithOne(x => x.User)
-            .HasForeignKey(x => x.UserId)
-            .IsRequired();
+    protected override void OnModelCreating(ModelBuilder modelBuilder) {
+      modelBuilder.Entity<UserModel>()
+        .HasMany(x => x.Files)
+        .WithOne(x => x.User)
+        .HasForeignKey(x => x.UserId)
+        .IsRequired();
 
-          modelBuilder.Entity<FileModel>()
-            .HasMany(x => x.Chunks)
-            .WithOne(x => x.File)
-            .HasForeignKey(x => x.FileId)
-            .IsRequired();
-        }
+      modelBuilder.Entity<FileModel>()
+        .HasMany(x => x.Chunks)
+        .WithOne(x => x.File)
+        .HasForeignKey(x => x.FileId)
+        .IsRequired();
     }
+  }
 }
