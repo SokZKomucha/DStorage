@@ -15,12 +15,9 @@ namespace Server.Controllers {
     [HttpGet]
     public IActionResult Get() {
 
-      var files = database.Users
-        .Where(x => x.Id == 1)
-        .SelectMany(x => x.Files);
-
-      files.ToList().ForEach(x => {
-        Console.WriteLine($"{x.Id}\t{x.Filename}");
+      var users = database.Users.Where(x => x.Id <= 5);
+      users.ToList().ForEach(x => {
+        Console.WriteLine($"{x.Id}");
       });
 
       return Ok("Ok!!!");

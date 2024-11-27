@@ -5,7 +5,7 @@
 
 ## Setup
 
-This web application is comprised of two parts: client and server. Both of them are run separately; following sections guide will you through its setup.
+This web application is comprised of two parts: client and server. Both of them are run separately; following sections will guide you through its setup.
 
 ### Requirements
 
@@ -24,11 +24,11 @@ npm i
 npm run dev 
 ```
 
-This opens the dev server on port 5173. Alternatively, one may build the entire client side using `npm run build` instead.
+This opens the dev server on port 5173. Alternatively, you may build the entire client side to raw HTML/CSS/JS using `npm run build` instead.
 
 ### Server setup
 
-*To be updated*
+An SQLite database (database.db) file is required in `/server/Data/` directory. Typically you'd want to create it using [EF Core migrations](https://learn.microsoft.com/en-us/ef/core/get-started/overview/first-app?tabs=netcore-cli), but in case of this application, I'd advise you to manually create `database.db` inside `/server/Data`. Using some kind of SQLite editor, run setup script from `/server/Data/template.sql` and save changes.
 
 <br>
 

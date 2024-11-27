@@ -5,5 +5,5 @@
 /server/obj
 /server/bin
 /server/appsettings.json
-/server/Data/database.db
+/server/Data/*.db
 /server/test.http
