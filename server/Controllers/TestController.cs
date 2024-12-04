@@ -16,7 +16,7 @@ namespace Server.Controllers {
 
     [HttpGet]
     public IActionResult Get() {
-      var users = database.Users.Where(x => x.Id <= 5);
+      var users = database.Users;
       return Ok(users);
     }
   }

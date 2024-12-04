@@ -48,3 +48,4 @@ I, or any of this project's contributors, take no legal responsibility for any d
 - Discord bot initialization
 - Dashboard, file list
 - File upload, both server and client
+- File route on server
