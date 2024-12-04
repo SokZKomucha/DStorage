@@ -1,3 +1,5 @@
+// Subject to change, will be deleted in the future.
+
 using Microsoft.AspNetCore.Mvc;
 using Server.Data;
 
@@ -14,13 +16,8 @@ namespace Server.Controllers {
 
     [HttpGet]
     public IActionResult Get() {
-
       var users = database.Users.Where(x => x.Id <= 5);
-      users.ToList().ForEach(x => {
-        Console.WriteLine($"{x.Id}");
-      });
-
-      return Ok("Ok!!!");
+      return Ok(users);
     }
   }
 }

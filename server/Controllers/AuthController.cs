@@ -39,11 +39,11 @@ namespace Server.Controllers {
     public IActionResult Login([FromBody] LoginUserDTO loginUserDto) {
 
       if (loginUserDto.Username == null || loginUserDto.Username.Trim() == "") {
-        return BadRequest("Username field is empty.");
+        return BadRequest("Username field is either null or empty.");
       }
 
       if (loginUserDto.Password == null || loginUserDto.Password.Trim() == "") {
-        return BadRequest("Password field is empty.");
+        return BadRequest("Password field is either null or empty.");
       }
 
       var user = database.Users
@@ -80,12 +80,12 @@ namespace Server.Controllers {
         return BadRequest("Password field is either null or empty.");
       }
 
-      if (database.Users.Where(x => x.Username == registerUserDto.Username).Any()) {
+      if (database.Users.Where(x => x.Username == registerUserDto.Username.Trim()).Any()) {
         return Conflict("Username already taken.");
       }
 
       UserModel user = new UserModel();
-      user.Username = registerUserDto.Username;
+      user.Username = registerUserDto.Username.Trim();
       user.PasswordHash = BCrypt.Net.BCrypt.EnhancedHashPassword(registerUserDto.Password.Trim());
       
       do {
@@ -100,7 +100,7 @@ namespace Server.Controllers {
         return StatusCode(500);
       }
 
-      Response.Cookies.Append("secret", user.Secret, new CookieOptions() {
+      Response.Cookies.Append("secret", user.Secret, new CookieOptions {
         HttpOnly = true,
         Secure = true,
         SameSite = SameSiteMode.None,

@@ -1,11 +1,11 @@
 # DStorage
-(In developement) file storage on Discord. For scientific purposes only.
+(In developement) file storage system on Discord. For scientific purposes only.
 
 <br>
 
 ## Setup
 
-This web application is comprised of two parts: client and server. Both of them are run separately; following sections will guide you through its setup.
+This web application is comprised of two parts, client and server. Both of them are run separately; following sections will guide you through the setup.
 
 ### Requirements
 
@@ -20,18 +20,31 @@ The following steps should be taken to set-up client side of this web applicatio
 
 ```bash
 cd client # If not inside already
-npm i
+npm install
 npm run dev 
 ```
 
-This opens the dev server on port 5173. Alternatively, you may build the entire client side to raw HTML/CSS/JS using `npm run build` instead.
+This opens a dev server on port 5173. Alternatively, you may build the entire client side to raw HTML/CSS/JS using `npm run build` instead.
 
 ### Server setup
 
-An SQLite database (database.db) file is required in `/server/Data/` directory. Typically you'd want to create it using [EF Core migrations](https://learn.microsoft.com/en-us/ef/core/get-started/overview/first-app?tabs=netcore-cli), but in case of this application, I'd advise you to manually create `database.db` inside `/server/Data`. Using some kind of SQLite editor, run setup script from `/server/Data/template.sql` and save changes.
+An `appsettins.json` file in `/server` is **necessary** to run the application. An `appsettings-example.json` file is provided, which you may use. `SQLiteConnectionString` may be left as is, but you'll need to set `DiscordToken` to your Discord bot's token. I'm not gonna write a tutorial how to get one, there're already tons of them on the internet. After completing that, rename the file to `appsettings.json`.
+
+Aside from runtime (assuming already installed), dependencies (should install automatically) and `appsettings.json`, an SQLite database (`database.db` file) is required in `/server/Data` directory, or whatever you've specified in appsettings. An already prepared file `database-example.db` is provided, with all commands from `template.sql` executed; make sure to rename it to `database.db` before running the application. 
+
+<!-- Server dependencies -->
 
 <br>
 
 ## Legal
 
-I, or any of this project's contributors, take no legal responsibility for any damage, harm or inappropriate actions done using this tool. Its purpose is to demonstrate such thing is possible, but it should not be exploited. Doing so may lead to your Discord server being closed, bot being deleted, or even you account being terminated. **Use at your own risk!**  
+I, or any of this project's contributors, take no legal responsibility for any damage, harm or inappropriate actions done using this tool. Its purpose is to demonstrate that such actions are possible, but it should not be exploited. Doing so may lead to your Discord server being closed, bot being deleted, or even you account being terminated. **Use at your own risk!**  
+
+<br>
+
+## Todo
+- Server-side authentication - basically done
+- Client-side authentication
+- Discord bot initialization
+- Dashboard, file list
+- File upload, both server and client
