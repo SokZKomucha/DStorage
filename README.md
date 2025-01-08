@@ -28,9 +28,9 @@ This opens a dev server on port 5173. Alternatively, you may build the entire cl
 
 ### Server setup
 
-An `appsettins.json` file in `/server` is **necessary** to run the application. An `appsettings-example.json` file is provided, which you may use. `SQLiteConnectionString` may be left as is, but you'll need to set `DiscordToken` to your Discord bot's token. I'm not gonna write a tutorial how to get one, there're already tons of them on the internet. After completing that, rename the file to `appsettings.json`.
+An `appsettins.json` file in `/server` is **necessary** to run the application. Example `appsettings.example.json` file is provided, without configured details, which you may use. `SQLiteConnectionString` may be left as is, but you'll need to set `DiscordToken` to your Discord bot's token. I'm not gonna write a tutorial how to get one, there're already tons of them on the internet. After completing that, rename the file to `appsettings.json`.
 
-Aside from runtime (assuming already installed), dependencies (should install automatically) and `appsettings.json`, an SQLite database (`database.db` file) is required in `/server/Data` directory, or whatever you've specified in appsettings. An already prepared file `database-example.db` is provided, with all commands from `template.sql` executed; make sure to rename it to `database.db` before running the application. 
+Aside from runtime (assuming already installed), dependencies (should install automatically) and `appsettings.json`, an SQLite database (`database.db` file) is required in `/server/Data` directory, or whatever you've specified in appsettings. An already prepared file `database.example.db` is provided, with all queries from `template.sql` executed; make sure to rename it to `database.db` before running the application. 
 
 <!-- Server dependencies -->
 
@@ -44,7 +44,8 @@ I, or any of this project's contributors, take no legal responsibility for any d
 
 ## Todo
 - Server-side authentication - basically done
-- Client-side authentication
+- Client-side authentication - add redirects when not authenticated
+- Set valid CORS rules
 - Discord bot initialization
 - Dashboard, file list
 - File upload, both server and client
