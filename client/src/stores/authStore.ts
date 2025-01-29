@@ -5,10 +5,6 @@ import type { IAuthResponse } from "../types/IAuthResponse";
 
 export const authStore = writable<IAuthData | null>(null);
 
-authStore.subscribe(v => {
-  console.log("Updated", v, new Date());
-});
-
 (async () => {
   const request = await fetch(config.baseUrl + "/api/auth", {
     credentials: "include"
