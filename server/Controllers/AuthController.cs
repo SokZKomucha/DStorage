@@ -108,6 +108,12 @@ namespace Server.Controllers {
 
       return StatusCode(201, new SuccesfulRegisterDTO(user.Id, user.Username));
     }
+  
+    [HttpGet("logout")]
+    public IActionResult Logout() {
+      Response.Cookies.Delete("secret");
+      return Ok();
+    }
   }
 }
 
