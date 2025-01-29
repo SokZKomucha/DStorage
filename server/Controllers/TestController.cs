@@ -16,8 +16,9 @@ namespace Server.Controllers {
 
     [HttpGet]
     public IActionResult Get() {
-      var users = database.Users;
-      return Ok(users);
+      // var users = database.Users;
+      // return Ok(users);
+      return Ok();
     }
   }
 }
