@@ -12,25 +12,24 @@
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username, password }),
-      credentials: "include"
+      credentials: "include",
     });
-    
+
     if (request.status !== 200) {
       status = await request.text();
-      authStore.set({ authenticated: false, data: null })
+      authStore.set({ authenticated: false, data: null });
       return;
     }
 
     const response: ILoginResponse = await request.json();
-    authStore.set({ authenticated: true, data: response })
+    authStore.set({ authenticated: true, data: response });
   }
-
 </script>
 
 <div>
-  Login
-  <input type="text" bind:value={username} />
-  <input type="password" bind:value={password} />
+  Login <br />
+  <input type="text" bind:value={username} /> <br />
+  <input type="password" bind:value={password} /> <br />
   <button on:click={onClick}>Login</button>
   <p>{status}</p>
 </div>
