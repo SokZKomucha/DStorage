@@ -4,20 +4,29 @@
   import Login from "./routes/Login.svelte";
   import Register from "./routes/Register.svelte";
   import { authStore } from "./stores/authStore";
+  import Upload from "./routes/Upload.svelte";
+  import Files from "./routes/Files.svelte";
+  import File from "./routes/File.svelte";
+  import NotFound from "./routes/NotFound.svelte";
 
 
 
   const routes = {
     "/": Home,
     "/register": Register,
-    "/login": Login
+    "/login": Login,
+    "/upload": Upload,
+    "/files": Files,
+    "/files/:id": File,
+    "*": NotFound
   };
   
   // Home       /
   // Register   /register
   // Login      /login
   // Upload     /upload
-  // Files      /files      /files/{id}
+  // Files      /files      
+  // File       /files/{id}
 
   $: {
     $location, $authStore

@@ -1,6 +1,6 @@
 <script lang="ts">
-    import { config } from "../config";
-    import { authStore } from "../stores/authStore";
+  import { config } from "../config";
+  import { authStore } from "../stores/authStore";
 
 
 </script>
