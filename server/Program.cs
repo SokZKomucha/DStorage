@@ -1,9 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using DSharpPlus;
+using DStorage.Services;
+using Microsoft.EntityFrameworkCore;
 using Server.Data;
 
 namespace Server {
   internal class Program {
-    static void Main(string[] args) {
+    public static async Task Main(string[] args) {
 
       WebApplicationBuilder builder = WebApplication.CreateSlimBuilder(args);
       builder.Services.AddControllers();
@@ -20,6 +22,11 @@ namespace Server {
       builder.Services.AddDbContext<SQLiteContext>(options => {
         options.UseSqlite(builder.Configuration.GetConnectionString("SQLiteConnectionString"));
       });
+
+      builder.Services.AddSingleton<DiscordBotService>();
+      builder.Services.AddHostedService(provider => provider.GetRequiredService<DiscordBotService>());
+
+
 
       WebApplication app = builder.Build();
       app.MapControllers();
