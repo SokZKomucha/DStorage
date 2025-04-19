@@ -10,10 +10,11 @@
 
     await fetch(config.baseUrl + "/api/file/upload", {
       method: "POST",
+      credentials: "include",
       headers: {
         "Content-Type": file.type
       },
-      body: file
+      body: file,
     });
     console.log("finito")
   }
