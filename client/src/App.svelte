@@ -38,6 +38,4 @@
   }
 </script>
 
-<div class="wrapper">
-  <Router {routes} />
-</div>
+<Router {routes} />

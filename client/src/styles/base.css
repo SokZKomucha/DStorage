@@ -1,0 +1,15 @@
+* {
+  box-sizing: border-box;
+  outline: 0;
+  padding: 0;
+  margin: 0;
+
+  font-family: system-ui;
+  font-weight: 500;
+}
+
+.route-wrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
