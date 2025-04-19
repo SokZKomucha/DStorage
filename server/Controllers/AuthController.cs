@@ -18,26 +18,20 @@ namespace Server.Controllers {
 
     [HttpGet]
     public IActionResult Authenticate() {
-
       if (Request.Cookies["secret"] == null) {
         return BadRequest("Missing \"secret\" cookie.");
       } 
 
-      var user = database.Users
-        .Where(x => x.Secret == Request.Cookies["secret"]);
-
-      if (!user.Any()) {
+      var user = database.Users.Where(x => x.Secret == Request.Cookies["secret"])?.First();
+      if (user == null) {
         return NotFound("User not found.");
       }
 
-      var userData = user.First();
-
-      return Ok(new SuccesfulAuthenticationDTO(userData.Id, userData.Username));      
+      return Ok(new SuccesfulAuthenticationDTO(user.Id, user.Username));      
     }
 
     [HttpPost("login")]
     public IActionResult Login([FromBody] LoginUserDTO loginUserDto) {
-
       if (loginUserDto.Username == null || loginUserDto.Username.Trim() == "") {
         return BadRequest("Username field is either null or empty.");
       }
@@ -46,31 +40,26 @@ namespace Server.Controllers {
         return BadRequest("Password field is either null or empty.");
       }
 
-      var user = database.Users
-        .Where(x => x.Username == loginUserDto.Username.Trim());
-
-      if (!user.Any()) {
+      var user = database.Users.Where(x => x.Username == loginUserDto.Username.Trim())?.First();
+      if (user == null) {
         return Unauthorized("Incorrect username or password.");
       }
 
-      var userData = user.First();
-
-      if (!BCrypt.Net.BCrypt.EnhancedVerify(loginUserDto.Password.Trim(), userData.PasswordHash)) {
+      if (!BCrypt.Net.BCrypt.EnhancedVerify(loginUserDto.Password.Trim(), user.PasswordHash)) {
         return Unauthorized("Incorrect username or password.");
       }
 
-      Response.Cookies.Append("secret", userData.Secret, new CookieOptions() {
+      Response.Cookies.Append("secret", user.Secret, new CookieOptions() {
         HttpOnly = true,
         Secure = true,
         SameSite = SameSiteMode.None,
       });
 
-      return Ok(new SuccesfulLoginDTO(userData.Id, userData.Username));
+      return Ok(new SuccesfulLoginDTO(user.Id, user.Username));
     }
     
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterDTO registerUserDto) {
-      
       string usernamePattern = "^[a-zA-Z0-9._-]{2,32}$";
       if (registerUserDto.Username == null || !Regex.IsMatch(registerUserDto.Username.Trim(), usernamePattern)) {
         return BadRequest($"Username field is either null, or does not match \"{usernamePattern}\" regular expression.");

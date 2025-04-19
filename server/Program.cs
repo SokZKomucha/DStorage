@@ -6,7 +6,6 @@ using Server.Data;
 namespace Server {
   internal class Program {
     public static async Task Main(string[] args) {
-
       WebApplicationBuilder builder = WebApplication.CreateSlimBuilder(args);
       builder.Services.AddControllers();
       
@@ -32,7 +31,6 @@ namespace Server {
       app.MapControllers();
       app.UseCors("allow");
       app.Run();
-
     }
   }
 }
