@@ -4,6 +4,7 @@
 
 /server/obj
 /server/bin
+/server/test
 /server/appsettings.json
 /server/Data/database.db
 /server/test.http
