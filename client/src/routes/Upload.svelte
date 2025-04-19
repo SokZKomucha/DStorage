@@ -12,7 +12,8 @@
       method: "POST",
       credentials: "include",
       headers: {
-        "Content-Type": file.type
+        "Content-Type": file.type,
+        "X-Filename": file.name
       },
       body: file,
     });

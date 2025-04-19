@@ -48,7 +48,7 @@ namespace Server.Controllers {
         return StatusCode(403, "User not found.");
       }
 
-      using var fileStream = new FileStream($"./test/{Guid.NewGuid()}", FileMode.Create, FileAccess.ReadWrite, FileShare.None, 4096, FileOptions.DeleteOnClose);
+      using var fileStream = new FileStream($"{Guid.NewGuid()}", FileMode.Create, FileAccess.ReadWrite, FileShare.None, 4096, FileOptions.DeleteOnClose);
       await Request.Body.CopyToAsync(fileStream);
       if (fileStream.Length != Request.ContentLength) {
         return BadRequest("Content length does not match with received length.");
@@ -58,9 +58,9 @@ namespace Server.Controllers {
         return StatusCode(500);
       }
 
-      var filename = Path.GetFileName(Request.Headers.TryGetValue("X-Filename", out var values) ? values.FirstOrDefault() ?? Guid.NewGuid().ToString() : Guid.NewGuid().ToString()); // Optional filename, fallback if not provided
+      var filename = Path.GetFileName(Request.Headers.TryGetValue("X-Filename", out var values) ? values.FirstOrDefault() ?? Guid.NewGuid().ToString() : Guid.NewGuid().ToString());
       var chunkCount = (long)Math.Ceiling((double)fileStream.Length / chunkSize);
-      var discordChannel = await discordBot.discordClient.GetChannelAsync(ulong.Parse(configuration["DiscordChannelId"] ?? "0")); // Will throw if a channel doesn't exist/is inaccessible, so that's good
+      var discordChannel = await discordBot.discordClient.GetChannelAsync(ulong.Parse(configuration["DiscordChannelId"] ?? "0"));
 
       var file = new FileModel();
       file.UserId = user.Id;
@@ -68,33 +68,36 @@ namespace Server.Controllers {
       file.FileSize = fileStream.Length;
       file.UploadDate = DateTime.Now;
       await database.Files.AddAsync(file);
-      await database.SaveChangesAsync(); // To get file's ID
+      await database.SaveChangesAsync();
 
-      fileStream.Position = 0; // Obligatory position reset
+      fileStream.Position = 0;
       for (long i = 0; i < chunkCount; i++) {
 
+        // FileStream initialization could probably be moved outside the loop, as to not create new temp file with every iteration
         long byteCount = Math.Min(chunkSize, fileStream.Length - fileStream.Position);
         byte[] buffer = new byte[byteCount];
         var chunkFileStream = new FileStream($"{Guid.NewGuid()}", FileMode.Create, FileAccess.ReadWrite, FileShare.None, 4096, FileOptions.DeleteOnClose);
-        // FileStream initialization could probably be moved outside the loop, as to not create new temp file with every iteration
-
         await fileStream.ReadExactlyAsync(buffer);        
         await chunkFileStream.WriteAsync(buffer);
         chunkFileStream.Position = 0;
-        // Console.WriteLine($"{buffer.Length} {chunkFileStream.Length}/{chunkFileStream.Position} {fileStream.Length}/{fileStream.Position}");
 
         var messageBuilder = new DiscordMessageBuilder();
         messageBuilder.Content = $"FileID: {file.Id}\nChunk {i + 1}/{chunkCount}";
         messageBuilder.AddFile(chunkFileStream);
-        var message = await discordChannel.SendMessageAsync(messageBuilder); // Again, will throw by itself if something was to happen
+        var message = await discordChannel.SendMessageAsync(messageBuilder);
 
         var chunk = new ChunkModel();
         chunk.FileId = file.Id;
         chunk.ByteCount = byteCount;
         chunk.DiscordMessageId = message.Id;
         await database.Chunks.AddAsync(chunk);
+        await chunkFileStream.DisposeAsync();
       }
 
+      // Error handling for D#+ errors is probably not needed; if something were
+      // to happen on D#+ side, it'd most likely throw and end the request with HTTP 500
+
+      await fileStream.DisposeAsync();
       await database.SaveChangesAsync();
       return Ok(new FileInfoDTO(file.Id, file.UserId, file.Filename, file.FileSize, file.UploadDate));
     }
