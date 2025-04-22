@@ -51,10 +51,12 @@ namespace Server.Controllers {
       using var fileStream = new FileStream($"{Guid.NewGuid()}", FileMode.Create, FileAccess.ReadWrite, FileShare.None, 4096, FileOptions.DeleteOnClose);
       await Request.Body.CopyToAsync(fileStream);
       if (fileStream.Length != Request.ContentLength) {
+        await fileStream.DisposeAsync();
         return BadRequest("Content length does not match with received length.");
       }
 
       if (discordBot.discordClient == null) {
+        await fileStream.DisposeAsync();
         return StatusCode(500);
       }
 
@@ -96,6 +98,7 @@ namespace Server.Controllers {
 
       // Error handling for D#+ errors is probably not needed; if something were
       // to happen on D#+ side, it'd most likely throw and end the request with HTTP 500
+      // Though, in case of error, the filestream will most likely get disposed only after application restart. That may need to be worked on.
 
       await fileStream.DisposeAsync();
       await database.SaveChangesAsync();
