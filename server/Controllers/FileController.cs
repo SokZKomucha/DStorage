@@ -18,7 +18,7 @@ namespace Server.Controllers {
     // The values below may be changed
     // Maximum file size is set to comfy 4 GiB, I don't see any problems increasing this value
     // Chunk size, however, determines how large the files sent to Discord will be. Obviously has to fit in 10 MiB limit.
-    public const long maxFileSize = 1024 * 1024;
+    public const long maxFileSize = 4L * 1024 * 1024 * 1024;
     public const long chunkSize = 9 * 1024 * 1024;
 
     private readonly SQLiteContext database;
