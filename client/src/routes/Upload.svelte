@@ -7,17 +7,24 @@
     const file = fileInput?.files?.[0];
     if (!file) return;
     console.log(file); 
-
-    await fetch(config.baseUrl + "/api/file/upload", {
-      method: "POST",
-      credentials: "include",
-      headers: {
-        "Content-Type": file.type,
-        "X-Filename": file.name
-      },
-      body: file,
-    });
-    console.log("finito")
+    
+    try {
+      const request = await fetch(config.baseUrl + "/api/file/upload", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": file.type,
+          "X-Filename": file.name
+        },
+        body: file,
+      });
+      console.log("Oki");
+    } catch (error) {
+      console.log("Error");      
+    }
+    console.log("Finito");
+    // Obviously such try-catch is ambiguous; this ties closely to an issue with supposed 413 code
+    
   }
 </script>
 

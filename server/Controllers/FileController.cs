@@ -18,7 +18,7 @@ namespace Server.Controllers {
     // The values below may be changed
     // Maximum file size is set to comfy 4 GiB, I don't see any problems increasing this value
     // Chunk size, however, determines how large the files sent to Discord will be. Obviously has to fit in 10 MiB limit.
-    public const long maxFileSize = 4L * 1024 * 1024 * 1024;
+    public const long maxFileSize = 1024 * 1024;
     public const long chunkSize = 9 * 1024 * 1024;
 
     private readonly SQLiteContext database;
@@ -31,10 +31,23 @@ namespace Server.Controllers {
       this.configuration = configuration;
     }
 
-    // [HttpGet]
-    // public async Task<IActionResult> Get() {
-    //   return Content($"Oki");
-    // }
+    [HttpGet]
+    public async Task<IActionResult> Get([FromQuery] int pageNumber = 0) {
+      return Content($"Oki; pageNumber={pageNumber}");
+      // Together with the files, return pagination info (eg. pageNumber, pageCount, previousPage/null, nextPage/null, fileCount)
+    }
+
+    [HttpGet("{fileId}")]
+    public async Task<IActionResult> GetOne([FromRoute] long fileId) {
+      return Content($"Oki; fileId={fileId}");
+      // Same as the above but only one file
+    }
+
+    [HttpGet("download/{fileId}")]
+    public async Task<IActionResult> Download([FromRoute] long fileId) {
+      return Content($"Download; fileId={fileId}");
+      // Obviously check whether the file belongs to the user
+    }
 
     [HttpPost("upload")]
     [RequestSizeLimit(maxFileSize)]
@@ -43,7 +56,7 @@ namespace Server.Controllers {
         return BadRequest("Missing \"secret\" cookie.");
       }
 
-      var user = database.Users.Where(x => x.Secret == Request.Cookies["secret"])?.First();
+      var user = database.Users.Where(x => x.Secret == Request.Cookies["secret"])?.FirstOrDefault();
       if (user == null) {
         return StatusCode(403, "User not found.");
       }

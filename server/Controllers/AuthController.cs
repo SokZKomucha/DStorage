@@ -22,7 +22,7 @@ namespace Server.Controllers {
         return BadRequest("Missing \"secret\" cookie.");
       } 
 
-      var user = database.Users.Where(x => x.Secret == Request.Cookies["secret"])?.First();
+      var user = database.Users.Where(x => x.Secret == Request.Cookies["secret"])?.FirstOrDefault();
       if (user == null) {
         return NotFound("User not found.");
       }
@@ -40,9 +40,9 @@ namespace Server.Controllers {
         return BadRequest("Password field is either null or empty.");
       }
 
-      var user = database.Users.Where(x => x.Username == loginUserDto.Username.Trim())?.First();
+      var user = database.Users.Where(x => x.Username == loginUserDto.Username.Trim())?.FirstOrDefault();
       if (user == null) {
-        return Unauthorized("Incorrect username or password.");
+        return Unauthorized("Incorrect username or password."); // It's actually the username thats incorrect but let's confuse the end user.
       }
 
       if (!BCrypt.Net.BCrypt.EnhancedVerify(loginUserDto.Password.Trim(), user.PasswordHash)) {

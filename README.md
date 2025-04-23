@@ -43,10 +43,17 @@ I, or any of this project's contributors, take no legal responsibility for any d
 <br>
 
 ## Todo
-- Server-side authentication - basically done
-- Client-side authentication - add redirects when not authenticated
-- Set valid CORS rules
-- Discord bot initialization
-- Dashboard, file list
-- File upload, both server and client
-- File route on server
+
+To implement:
+- [x] Server-side authentication
+- [x] Client-side authentication
+- [x] Discord bot initialization
+- [] Dashboard, file list
+- [] File route on server
+- [] File upload, both server and client
+  - [x] Basic upload 
+  - [] Account for file size too large
+- [] Enclose all fetch requests in try-catch
+
+To fix:
+- [] Fix an error; when a file too large is uploaded, it supposedly returns HTTP 413, but browser interprets it as CORS failure
