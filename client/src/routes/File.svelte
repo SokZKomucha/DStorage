@@ -19,7 +19,7 @@
 
 <div>
   {#await fileDetailsPromise}
-    <p>Loading</p>
+    <p>Loading...</p>
   {:then fileDetails} 
     <p>{fileDetails}</p>
   {/await}

@@ -49,7 +49,10 @@ To implement:
 - [x] Client-side authentication
 - [x] Discord bot initialization
 - [] Dashboard, file list
-- [] File route on server
+- [x] File route on server
+  - [x] /files?pageNumber -> paginated files
+  - [x] /files/{id} -> singular file
+  - [x] /files/download -> download file
 - [] File upload, both server and client
   - [x] Basic upload 
   - [] Account for file size too large

@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
+using Newtonsoft.Json.Serialization;
 using Server.Data;
 using Server.DTOs;
 using Server.Models;
@@ -74,7 +75,7 @@ namespace Server.Controllers {
     }
 
     [HttpGet("{fileId}")]
-    public async Task<IActionResult> GetOne([FromRoute] long fileId) {
+    public IActionResult GetOne([FromRoute] long fileId) {
       if (Request.Cookies["secret"] == null) {
         return BadRequest("Missing \"secret\" cookie.");
       }
@@ -94,12 +95,61 @@ namespace Server.Controllers {
 
     [HttpGet("download/{fileId}")]
     public async Task<IActionResult> Download([FromRoute] long fileId) {
-      return Content($"Download; fileId={fileId}");
-      // Obviously check whether the file belongs to the user
+      if (Request.Cookies["secret"] == null) {
+        return BadRequest("Missing \"secret\" cookie.");
+      }
+
+      var user = database.Users.Where(x => x.Secret == Request.Cookies["secret"])?.FirstOrDefault();
+      if (user == null) {
+        return StatusCode(403, "User not found.");
+      }
+
+      var file = database.Files.Where(x => x.Id == fileId && x.UserId == user.Id)?.FirstOrDefault();
+      if (file == null) {
+        return NotFound("File not found.");
+      }
+
+      if (discordBot.discordClient == null) {
+        return StatusCode(500);
+      }
+
+      using var fileStream = new FileStream($"{Guid.NewGuid()}", FileMode.Create, FileAccess.ReadWrite, FileShare.None, 4096, FileOptions.DeleteOnClose);
+      using var httpClient = new HttpClient();
+      var discordChannel = await discordBot.discordClient.GetChannelAsync(ulong.Parse(configuration["DiscordChannelId"] ?? "0"));
+      var fileChunks = database.Chunks.Where(x => x.FileId == file.Id);
+      
+      if (fileChunks.Sum(x => x.ByteCount) != file.FileSize) {
+        return StatusCode(422, "File is most likely malformed.");
+      }
+
+      foreach (var chunk in fileChunks) {
+        try {
+          var message = await discordChannel.GetMessageAsync(chunk.DiscordMessageId);
+          var attachmentUrl = message.Attachments[0]?.Url;
+          if (attachmentUrl == null) {
+            return StatusCode(500);
+          }
+
+          byte[] chunkData = await httpClient.GetByteArrayAsync(attachmentUrl);
+          await fileStream.WriteAsync(chunkData);
+        } catch {
+          return StatusCode(500);
+        }
+      }
+
+      Response.ContentType = "application/octet-stream";
+      Response.ContentLength = file.FileSize;
+      Response.Headers.ContentDisposition = $"attachment; filename={Uri.EscapeDataString(file.Filename)}";
+
+      await fileStream.FlushAsync(); // Is it necessary though?
+      fileStream.Position = 0;
+      await fileStream.CopyToAsync(Response.Body);
+
+      return Empty; 
     }
 
     [HttpPost("upload")]
-    [RequestSizeLimit(512 * 1024)]
+    [RequestSizeLimit(maxFileSize)]
     public async Task<IActionResult> Upload() {
       if (Request.Cookies["secret"] == null) {
         return BadRequest("Missing \"secret\" cookie.");
@@ -122,7 +172,7 @@ namespace Server.Controllers {
         return StatusCode(500);
       }
 
-      var filename = Path.GetFileName(Request.Headers.TryGetValue("X-Filename", out var values) ? values.FirstOrDefault() ?? Guid.NewGuid().ToString() : Guid.NewGuid().ToString());
+      var filename = Path.GetFileName(Request.Headers.TryGetValue("X-Filename", out var values) ? Uri.UnescapeDataString(values.FirstOrDefault() ?? Guid.NewGuid().ToString()) : Guid.NewGuid().ToString());
       var chunkCount = (long)Math.Ceiling((double)fileStream.Length / chunkSize);
       var discordChannel = await discordBot.discordClient.GetChannelAsync(ulong.Parse(configuration["DiscordChannelId"] ?? "0"));
 

@@ -14,13 +14,13 @@
         credentials: "include",
         headers: {
           "Content-Type": file.type,
-          "X-Filename": file.name
+          "X-Filename": encodeURIComponent(file.name)
         },
         body: file,
       });
       console.log("Oki");
     } catch (error) {
-      console.log("Error");      
+      console.log("Error", error);      
     }
     console.log("Finito");
     // Obviously such try-catch is ambiguous; this ties closely to an issue with supposed 413 code
