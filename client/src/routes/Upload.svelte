@@ -9,7 +9,7 @@
     console.log(file); 
     
     try {
-      const request = await fetch(config.baseUrl + "/api/file/upload", {
+      const request = await fetch(config.baseUrl + "/api/files/upload", {
         method: "POST",
         credentials: "include",
         headers: {

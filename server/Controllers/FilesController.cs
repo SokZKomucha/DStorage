@@ -15,7 +15,7 @@ using Server.Models;
 namespace Server.Controllers {
   [Route("/api/[controller]")]
   [ApiController]
-  public class FileController : ControllerBase {
+  public class FilesController : ControllerBase {
 
     // The values below may be changed
     // Maximum file size is set to comfy 4 GiB, I don't see any problems increasing this value
@@ -27,7 +27,7 @@ namespace Server.Controllers {
     private readonly DiscordBotService discordBot;
     private readonly IConfiguration configuration;
 
-    public FileController(SQLiteContext database, DiscordBotService discordBot, IConfiguration configuration) {
+    public FilesController(SQLiteContext database, DiscordBotService discordBot, IConfiguration configuration) {
       this.database = database;
       this.discordBot = discordBot;
       this.configuration = configuration;
@@ -75,8 +75,21 @@ namespace Server.Controllers {
 
     [HttpGet("{fileId}")]
     public async Task<IActionResult> GetOne([FromRoute] long fileId) {
-      return Content($"Oki; fileId={fileId}");
-      // Same as the above but only one file
+      if (Request.Cookies["secret"] == null) {
+        return BadRequest("Missing \"secret\" cookie.");
+      }
+
+      var user = database.Users.Where(x => x.Secret == Request.Cookies["secret"])?.FirstOrDefault();
+      if (user == null) {
+        return StatusCode(403, "User not found");
+      }
+
+      var file = database.Files.Where(x => x.Id == fileId && x.UserId == user.Id)?.FirstOrDefault();
+      if (file == null) {
+        return NotFound("File not found.");
+      } 
+
+      return Ok(new FileDTO(file.Id, file.UserId, file.Filename, file.FileSize, file.UploadDate));
     }
 
     [HttpGet("download/{fileId}")]
