@@ -65,9 +65,10 @@ namespace Server.Controllers {
       return Ok(new FilesDTO(
         totalPageCount,
         pageFileCount != 0 ? pageNumber : null,
-        pageNumber > 0 ? pageNumber - 1 : null,
+        (pageNumber > 0 && pageNumber - totalPageCount <= 0) ? pageNumber - 1 : null,
         pageNumber + 1 < totalPageCount ? pageNumber + 1 : null,
         pageFileCount,
+        totalUserFileCount,
         pageFiles
       ));
     }
