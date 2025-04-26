@@ -4,7 +4,9 @@ using DSharpPlus.Entities;
 using DStorage.Services;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Server.Data;
 using Server.DTOs;
@@ -33,8 +35,41 @@ namespace Server.Controllers {
 
     [HttpGet]
     public async Task<IActionResult> Get([FromQuery] int pageNumber = 0) {
-      return Content($"Oki; pageNumber={pageNumber}");
-      // Together with the files, return pagination info (eg. pageNumber, pageCount, previousPage/null, nextPage/null, fileCount)
+      if (pageNumber < 0) {
+        return BadRequest("pageNumber may not be smaller than 0.");
+      }
+      
+      if (Request.Cookies["secret"] == null) {
+        return BadRequest("Missing \"secret\" cookie.");
+      }
+
+      var user = database.Users.Where(x => x.Secret == Request.Cookies["secret"])?.FirstOrDefault();
+      if (user == null) {
+        return StatusCode(403, "User not found");
+      }
+
+      int filesPerPage = 3;
+      var allUserFiles = database.Files.Where(x => x.UserId == user.Id);
+      var totalUserFileCount = await allUserFiles.CountAsync();
+      var totalPageCount = (int)Math.Ceiling((decimal)totalUserFileCount / filesPerPage);
+
+      var pageFiles = allUserFiles
+        .OrderBy(x => x.Id)
+        .Skip(pageNumber * filesPerPage)
+        .Take(filesPerPage)
+        .ToList()
+        .Select(x => new FileDTO(x.Id, x.UserId, x.Filename, x.FileSize, x.UploadDate))
+        .ToArray();
+      var pageFileCount = pageFiles.Length; 
+
+      return Ok(new FilesDTO(
+        totalPageCount,
+        pageFileCount != 0 ? pageNumber : null,
+        pageNumber > 0 ? pageNumber - 1 : null,
+        pageNumber + 1 < totalPageCount ? pageNumber + 1 : null,
+        pageFileCount,
+        pageFiles
+      ));
     }
 
     [HttpGet("{fileId}")]
@@ -50,7 +85,7 @@ namespace Server.Controllers {
     }
 
     [HttpPost("upload")]
-    [RequestSizeLimit(maxFileSize)]
+    [RequestSizeLimit(512 * 1024)]
     public async Task<IActionResult> Upload() {
       if (Request.Cookies["secret"] == null) {
         return BadRequest("Missing \"secret\" cookie.");
@@ -115,7 +150,7 @@ namespace Server.Controllers {
 
       await fileStream.DisposeAsync();
       await database.SaveChangesAsync();
-      return Ok(new FileInfoDTO(file.Id, file.UserId, file.Filename, file.FileSize, file.UploadDate));
+      return Ok(new FileDTO(file.Id, file.UserId, file.Filename, file.FileSize, file.UploadDate));
     }
   }
 }
