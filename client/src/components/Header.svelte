@@ -59,6 +59,6 @@
     background: none;
     border: none;
     cursor: pointer;
-    font-weight: bold;
+    /* font-weight: bold; */
   }
 </style>

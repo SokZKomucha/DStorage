@@ -49,7 +49,7 @@ namespace Server.Controllers {
         return StatusCode(403, "User not found");
       }
 
-      int filesPerPage = 3;
+      int filesPerPage = 15;
       var allUserFiles = database.Files.Where(x => x.UserId == user.Id);
       var totalUserFileCount = await allUserFiles.CountAsync();
       var totalPageCount = (int)Math.Ceiling((decimal)totalUserFileCount / filesPerPage);
@@ -70,6 +70,7 @@ namespace Server.Controllers {
         pageNumber + 1 < totalPageCount ? pageNumber + 1 : null,
         pageFileCount,
         totalUserFileCount,
+        filesPerPage,
         pageFiles
       ));
     }
@@ -165,6 +166,10 @@ namespace Server.Controllers {
       if (fileStream.Length != Request.ContentLength) {
         await fileStream.DisposeAsync();
         return BadRequest("Content length does not match with received length.");
+      }
+
+      if (fileStream.Length == 0) {
+        return BadRequest("An empty file may not be uploaded.");
       }
 
       if (discordBot.discordClient == null) {

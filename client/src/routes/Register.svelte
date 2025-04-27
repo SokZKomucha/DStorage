@@ -30,6 +30,13 @@
   Register <br />
   <input type="text" bind:value={username} /> <br />
   <input type="password" bind:value={password} /> <br />
-  <button on:click={onClick}>Register</button>
+  <button on:click={onClick}>Register</button> <a href="#/login">Log-in instead</a>
   <p>{status}</p>
 </div>
+
+<style>
+  div {
+    padding-block: 2em;
+    padding-inline: 4em;
+  }
+</style>

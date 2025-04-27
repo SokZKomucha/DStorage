@@ -22,10 +22,11 @@
 <style>
   main {
     flex: 1;
-    padding-block: 5em;
-    padding-inline: 10em;
+    padding-block: 4em;
+    padding-inline: 8em;
     display: flex;
     flex-direction: column;
+    gap: 1em;
   }
 
   .username {

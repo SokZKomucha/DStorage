@@ -8,5 +8,6 @@ export interface IPagedFiles {
   nextPage: number | null;
   pageFileCount: number;
   totalFileCount: number;
+  filesPerPage: number;
   files: IFile[];
 }
