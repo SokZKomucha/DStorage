@@ -1,5 +1,6 @@
 # DStorage
 (In developement) file storage system on Discord. For scientific purposes only.
+(To be completly honest, the app IS in usable state right now)
 
 <br>
 
@@ -48,7 +49,7 @@ To implement:
 - [x] Server-side authentication
 - [x] Client-side authentication
 - [x] Discord bot initialization
-- [] Dashboard, file list
+- [x] Dashboard, file list
 - [x] File route on server
   - [x] /files?pageNumber -> paginated files
   - [x] /files/{id} -> singular file
